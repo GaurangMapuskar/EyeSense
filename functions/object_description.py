@@ -1,6 +1,3 @@
-import tensorflow as tf
-from tensorflow import keras
-import numpy as np
 import cv2
 import pathlib
 import textwrap
@@ -11,6 +8,7 @@ import google.generativeai as genai
 from IPython.display import display, Markdown
 import threading
 from flask import redirect, url_for
+from camera import VideoCamera
 
 def object_description():
     r = sr.Recognizer()
@@ -20,13 +18,9 @@ def object_description():
         text = text.replace('•', '  *')
         return Markdown(textwrap.indent(text, '> ', predicate=lambda _: True))
 
-    cap = cv2.VideoCapture(0)
-    cap.set(3, 640)
-    cap.set(4, 480)
+    model = genai.GenerativeModel('gemini-1.0-pro-vision-latest')
     font = cv2.FONT_HERSHEY_COMPLEX
     filename = "captured_image.jpg"
-
-    model = genai.GenerativeModel('gemini-1.0-pro-vision-latest')
 
     def speech_recognition_thread():
         while True:
@@ -45,27 +39,32 @@ def object_description():
                 print("Unknown error occurred.")
 
     def describe_image(command):
-        cv2.imwrite(filename, imgOrignal)
-        img = Image.open(filename)
-        response = model.generate_content([command, img])
+        img = video_camera.get_frame()
+        cv2.imwrite(filename, img)
+        image = Image.open(filename)
+        response = model.generate_content([command, image])
         response.resolve()
         description = response.text
-        print("Model Response:", description)
-        cv2.putText(imgOrignal, description, (10, 30), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+        print(description)
+        cv2.putText(img, description, (10, 30), font, 1, (255, 255, 255), 2, cv2.LINE_AA)
+  
+
+    # Create an instance of VideoCamera
+    video_camera = VideoCamera()
 
     thread = threading.Thread(target=speech_recognition_thread)
     thread.daemon = True
     thread.start()
 
     while True:
-        success, imgOrignal = cap.read()
+        img = video_camera.get_frame()
+        ret, encoded_frame = cv2.imencode('.jpg', img)
+        yield (b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encoded_frame) + b'\r\n')
         
-        cv2.imshow("Result", imgOrignal)
         k = cv2.waitKey(1)
         if k == ord('q'):
             break
 
     if k == ord('q'):
-        cap.release()
         cv2.destroyAllWindows()
         return redirect(url_for('index'))

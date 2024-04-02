@@ -13,6 +13,10 @@
             padding: 0;
             background-color: #f0f0f0;
             text-align: center;
+            background-image: url('/img/background.png'); /* Add your background image URL here */
+            background-size: cover; /* Cover the entire background */
+            background-position: center; /* Center the background image */
+            background-repeat: no-repeat; /* Do not repeat the background image */
         }
         #header {
             background-color: #5da7f0;
@@ -51,6 +55,18 @@
             text-decoration: none;
             color: white;
         }
+        #content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 200px); /* Adjust height to fit the camera feed */
+        }
+        #video_feed {
+            max-width: 100%;
+            max-height: 100%;
+            border: 1px solid #ccc; /* Add border for better visibility */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Add shadow for better visibility */
+        }
     </style>
 </head>
 <body>
@@ -60,13 +76,13 @@
             <h1>EyeSense</h1>
         </div>
         <div>
-            <a href="contact" class="nav-link">Contact</a>
-            <a href="about" class="nav-link">About</a>
+            <a href="/templates/contact.html" class="nav-link">Contact</a>
+            <a href="/templates/about.html" class="nav-link">About</a>
         </div>
     </div>
-    <img src="{{ url_for('video_feed') }}" alt="Object Detection">
+    
     <div id="content">
-        <!-- Add your main content here -->
+        <img id="video_feed" src="{{ url_for('currency') }}">
     </div>
     <div id="footer">
         <form action="/" method="get">
