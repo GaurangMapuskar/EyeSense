@@ -2,6 +2,7 @@ import cv2
 from camera import VideoCamera
 from flask import Flask, render_template, Response, request
 from functions.currency_detection import currency_detection
+from functions.face_detection import face_detection
 from functions.object_description import object_description
 from functions.object_detection import object_detection
 
@@ -17,6 +18,8 @@ def index():
         return render_template('currency.html')
     elif action == 'object_description':
         return render_template('description.html')
+    elif action == 'face_detection':
+        return render_template('face.html')
     return render_template('index.html')
     
 class VideoCamera(object):
@@ -55,6 +58,10 @@ def description():
 def object():
     return Response(object_detection(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/face')
+def face():
+    return Response(face_detection(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
@@ -62,6 +69,7 @@ def contact():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
 
 
 if __name__ == '__main__':
