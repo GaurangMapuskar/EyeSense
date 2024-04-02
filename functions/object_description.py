@@ -10,6 +10,7 @@ import speech_recognition as sr
 import google.generativeai as genai
 from IPython.display import display, Markdown
 import threading
+from flask import redirect, url_for
 
 def object_description():
     r = sr.Recognizer()
@@ -23,7 +24,7 @@ def object_description():
     cap.set(3, 640)
     cap.set(4, 480)
     font = cv2.FONT_HERSHEY_COMPLEX
-    filename = "../captured_image.jpg"
+    filename = "captured_image.jpg"
 
     model = genai.GenerativeModel('gemini-1.0-pro-vision-latest')
 
@@ -67,3 +68,4 @@ def object_description():
     if k == ord('q'):
         cap.release()
         cv2.destroyAllWindows()
+        return redirect(url_for('index'))

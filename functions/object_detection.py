@@ -6,6 +6,7 @@ import numpy as np
 import cv2
 from keras.models import load_model
 import numpy as np
+from flask import redirect, url_for
 
 def object_detection():
     cap=cv2.VideoCapture(0)
@@ -45,5 +46,6 @@ def object_detection():
     if k == ord('q'):
         cap.release()
         cv2.destroyAllWindows()
+        return redirect(url_for('index'))
 
 
